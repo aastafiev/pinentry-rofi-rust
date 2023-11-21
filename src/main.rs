@@ -2,34 +2,52 @@ mod pinentry;
 
 use pinentry::pinentry;
 
+use clap::{Command, Args, FromArgMatches};
+// use clap::Parser;
 use std::{io, collections::HashMap};
-use clap::Parser;
+// use std::io;
 
 
-const VERSION: &str= "0.1.0";
+const VERSION: &str= env!("CARGO_PKG_VERSION");
 
-/// A simple pinentry program using rofi.{n}
-/// {n}INSTALL.{n}
-/// 1. Copy `pinentry-rofi` to your `~/.local/bin`.{n}
-/// 2. `chmod +x ~/.local/bin/pinentry-rofi`.{n}
-/// 3. Set `pinentry-program` in `~/.gnupg/gpg-agent.conf`. For example:{n}
-///    `pinentry-program <HOME>/.local/bin/pinentry-rofi`{n}
-/// 4. Restart gpg-agent `gpgconf --kill gpg-agent`'''{n}
-#[derive(Parser, Debug)]
-#[command(author, version, about)]
-struct Args {
+
+#[derive(Debug, Args)]
+struct RofiArgs {
     /// Set display
-    #[clap(short, long, default_value = ":0", env)]
+    #[arg(short, long, default_value = ":0", env)]
     display: String,
 
     /// Set rofi prompt
-    #[clap(short, long, env = "PINENTRY_USER_DATA")]
+    #[arg(short, long, env = "PINENTRY_USER_DATA")]
     prompt: Option<String>,
 }
 
 
+fn cmd() -> Command {
+    let cli = clap::command!()
+        .after_help("INSTALL:\n  \
+  1. Copy `pinentry-rofi` to your `~/.local/bin`.
+  2. `chmod +x ~/.local/bin/pinentry-rofi`.
+  3. Set `pinentry-program` in `~/.gnupg/gpg-agent.conf`. For example:
+     `pinentry-program <HOME>/.local/bin/pinentry-rofi`
+  4. Restart gpg-agent `gpgconf --kill gpg-agent`")
+        .help_template("\
+{before-help}{name} {version}
+{author-with-newline}
+{usage-heading} {usage}
+{after-help}
+
+{all-args}
+");
+    RofiArgs::augment_args(cli)
+}
+
+
 fn main() -> io::Result<()> {
-    let args = Args::parse();
+    let matches = cmd().get_matches();
+    let args = RofiArgs::from_arg_matches(&matches)
+        .map_err(|err| err.exit())
+        .unwrap();
 
     let mut rofi_args = HashMap::from([
         (String::from("-dmenu"), None),

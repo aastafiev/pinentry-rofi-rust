@@ -1,0 +1,19 @@
+[package]
+name = "pinentry-rofi"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+authors = ["Aleksey Astafiev <aastafiev@gmail.com>"]
+license = "GPL-3"
+description = "Pinentry rofi on Rust language"
+homepage = "https://github.com/aastafiev/pinentry-rofi-rust"
+repository = "https://github.com/aastafiev/pinentry-rofi-rust"
+keywords = ["pinentry", "rofi"]
+categories = ["command-line-utilities"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.4.8", features = ["derive", "env"] }
+glib = "0.18.3"
+urlencoding = "2.1.3"

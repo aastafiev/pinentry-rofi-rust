@@ -6,13 +6,13 @@ use clap::{Command, Args, FromArgMatches, ArgMatches};
 const VERSION: &str= env!("CARGO_PKG_VERSION");
 
 #[derive(Debug, Args)]
-pub struct RofiArgs {
+struct RofiArgs {
     /// Set display
     #[arg(short, long, default_value = ":0", env)]
     display: String,
 
     /// Set rofi prompt
-    #[arg(short, long, env = "PINENTRY_USER_DATA")]
+    #[arg(short, long, default_value = "", env = "PINENTRY_USER_DATA")]
     prompt: Option<String>,
 }
 

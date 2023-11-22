@@ -1,7 +1,7 @@
 use std::{io, io::prelude::*, process, collections::HashMap, env};
 use urlencoding::decode;
 use glib::markup_escape_text;
-use clap::{Command, Args, FromArgMatches, ArgMatches};
+use clap::{Command, Args, FromArgMatches, ArgMatches, Arg};
 
 const VERSION: &str= env!("CARGO_PKG_VERSION");
 
@@ -19,6 +19,16 @@ struct RofiArgs {
 
 pub fn cmd() -> Command {
     let cli = clap::command!()
+        .arg(Arg::new("test-mode")
+            .long("test-mode")
+            .default_value("false")
+            .num_args(0..=1)
+            .require_equals(true)
+            .default_missing_value("true")
+            .hide(true)
+            .help("Using for autotesting. Prevent running rofi.")
+        )
+            //  .hide(true))
         .after_help("INSTALL:\n  \
   1. Copy `pinentry-rofi` to your `~/.local/bin`.
   2. `chmod +x ~/.local/bin/pinentry-rofi`.
@@ -70,7 +80,8 @@ fn run_rofi(rofi_args: &mut HashMap<String, Option<String>>) -> io::Result<bool>
 }
 
 
-pub fn handle_command(action: &str, arg: &str, rofi_args: &mut HashMap<String, Option<String>>) -> io::Result<()> {
+pub fn handle_command(action: &str, arg: &str, rofi_args: &mut HashMap<String, Option<String>>,
+                      is_test: &bool) -> io::Result<()> {
     let mut ok = true;
 
     match (action, arg) {
@@ -103,7 +114,7 @@ pub fn handle_command(action: &str, arg: &str, rofi_args: &mut HashMap<String, O
             let decoded = markup_escape_text(&unquoted);
             rofi_args.insert(String::from("-mesg"), Some(decoded.as_str().to_string()));
         },
-        ("GETPIN", _) => { ok = run_rofi(rofi_args).unwrap(); },
+        ("GETPIN", _) => {ok = if !is_test { run_rofi(rofi_args).unwrap() } else { true }; },
         ("SETERROR", arg) => {
             let sep = "\r***************************\r";
             rofi_args
@@ -128,6 +139,11 @@ pub fn handle_command(action: &str, arg: &str, rofi_args: &mut HashMap<String, O
 
 
 pub fn pinentry(args_matches: &ArgMatches) -> io::Result<()> {
+    let is_test = match args_matches.get_one::<String>("test-mode").unwrap().parse::<bool>() {
+        Ok(v) => v,
+        Err(_) => false,
+    };
+
     let args = RofiArgs::from_arg_matches(args_matches)
         .map_err(|err| err.exit())
         .unwrap();
@@ -152,7 +168,35 @@ pub fn pinentry(args_matches: &ArgMatches) -> io::Result<()> {
     for line in io::stdin().lock().lines() {
         let row = line?;
         let (action, arg) = row.split_once(' ').unwrap_or_else(|| (&row, ""));
-        handle_command(action, arg, &mut rofi_args)?;
+        handle_command(action, arg, &mut rofi_args, &is_test)?;
     }
     Ok(())
 }
+
+
+
+// #[cfg(test)]
+// mod tests {
+//     use assert_cmd::Command;
+
+    
+//     let mut cmd = Command::cargo_bin(assert_cmd::crate_name!()).unwrap();
+//     let assert = cmd
+//         .arg("-A")
+//         .env("stdout", "hello")
+//         .env("exit", "42")
+//         .write_stdin("42")
+//         .assert();
+//     assert
+//         .failure()
+//         .code(42)
+//         .stdout("hello\n");
+
+
+//     #[test]
+//     fn it_works() {
+//         let result = 2 + 2;
+//         assert_eq!(result, 4);
+//     }
+// }
+

@@ -198,12 +198,12 @@ pub fn pinentry(args_matches: &ArgMatches) -> BoxResult<()> {
         None => {}
     }
 
+    let is_test = false;
     let mut writer = Writer::new();
     writer.assuan_send("OK Please go ahead")?;
     for line in io::stdin().lock().lines() {
         let cmd = line?;
         let (action, arg) = cmd.split_once(' ').unwrap_or_else(|| (&cmd, ""));
-        let is_test = false;
         handle_command(action, arg, &mut rofi_args, &mut writer, &is_test)?;
     }
     Ok(())

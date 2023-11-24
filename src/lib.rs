@@ -39,7 +39,7 @@ pub fn cmd() -> Command {
     RofiArgs::augment_args(cli)
 }
 
-pub struct Writer<'a> {
+struct Writer<'a> {
     writer: Box<dyn Write + 'a>,
 }
 

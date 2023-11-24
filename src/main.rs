@@ -1,8 +1,6 @@
-use std::io;
+use pinentry_rofi::{cmd, pinentry, BoxResult};
 
-use pinentry_rofi::{cmd, pinentry};
-
-fn main() -> io::Result<()> {
+fn main() -> BoxResult<()> {
     let matches = cmd().get_matches();
     pinentry(&matches)?;
     Ok(())

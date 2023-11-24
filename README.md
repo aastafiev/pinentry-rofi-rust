@@ -11,13 +11,14 @@ Inspired by [gist](https://gist.github.com/Cimbali/862a430a0f28ffe07f8ae618e8b73
 
 ## Install
 
-1. Copy `pinentry-rofi` to your `~/.local/bin`
-2. `chmod +x ~/.local/bin/pinentry-rofi`
-3. Set `pinentry-program` in `~/.gnupg/gpg-agent.conf`. For example:
+1. Build with `cargo build --release`
+2. Copy `target/release/pinentry-rofi` to `~/.local/bin` or `/usr/bin`
+3. `chmod +x your/path/pinentry-rofi`
+4. Set `pinentry-program` in `~/.gnupg/gpg-agent.conf`. For example:
 
     `pinentry-program <HOME>/.local/bin/pinentry-rofi`
 
-4. Restart gpg-agent `gpgconf --kill gpg-agent`
+5. Restart gpg-agent `gpgconf --kill gpg-agent`
 
 ## Documentation
 

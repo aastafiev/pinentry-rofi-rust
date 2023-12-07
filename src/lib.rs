@@ -140,20 +140,20 @@ fn handle_command<'a>(
         ("GETINFO", "version") => writer.assuan_send(format!("D {}", env!("CARGO_PKG_VERSION")).as_ref())?,
         ("SETPROMPT", arg) => {
             if !rofi_args.contains_key("-p") {
-                rofi_args.insert(String::from("-p"), Some(arg.replace(":", "")));
+                rofi_args.insert("-p".to_owned(), Some(arg.replace(":", "")));
             }
         }
         ("SETDESC", arg) => {
             let unquoted = decode(arg).unwrap().into_owned().replace("\n", "\r");
             let decoded = markup_escape_text(&unquoted);
-            rofi_args.insert(String::from("-mesg"), Some(decoded.as_str().to_owned()));
+            rofi_args.insert("-mesg".to_owned(), Some(decoded.as_str().to_owned()));
         }
         ("GETPIN", _) => {
             ok = if !is_test { run_rofi(rofi_args, writer)? } else { true };
         }
         ("SETERROR", arg) => {
             let sep = "\r***************************\r";
-            rofi_args.entry(String::from("-mesg")).and_modify(|e| {
+            rofi_args.entry("-mesg".to_owned()).and_modify(|e| {
                 let val = e.as_ref().unwrap();
                 let prev_msg = val.rsplit_once(sep).unwrap_or_else(|| ("", val)).1;
                 *e = Some([arg, prev_msg].join(sep))

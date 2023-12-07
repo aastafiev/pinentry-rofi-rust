@@ -58,7 +58,7 @@ impl Writer<'_> {
     }
 }
 
-fn run_rofi(rofi_args: &mut HashMap<String, Option<String>>, writer: &mut Writer) -> io::Result<bool> {
+fn run_rofi(rofi_args: &HashMap<String, Option<String>>, writer: &mut Writer) -> io::Result<bool> {
     let args: Vec<&String> = rofi_args
         .iter()
         .flat_map(|(arg, val)| match val {

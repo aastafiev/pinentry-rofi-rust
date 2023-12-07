@@ -7,7 +7,7 @@ Inspired by [gist](https://gist.github.com/Cimbali/862a430a0f28ffe07f8ae618e8b73
 ## Dependencies
 
 - Rust language for building (Packages: glib, urlencoding, clap)
-- rofi
+- [rofi](https://github.com/davatorium/rofi)
 
 ## Install
 
